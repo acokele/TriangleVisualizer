@@ -24,7 +24,6 @@ namespace TriangleVisualizer
         Pen trianglePen = new Pen(Color.Red, 2);
 
         List<VisualizerGroup> visualizers = new List<VisualizerGroup>();
-
         public Form1()
         {
             InitializeComponent();
@@ -160,7 +159,6 @@ namespace TriangleVisualizer
                 foreach (IVisualizer v in visualizers)
                     v.Visualize(e.Graphics, triangle);
 
-
             for (int i = 0; i < 3; ++i)
                 e.Graphics.DrawLine(trianglePen, triangle[i], triangle[(i + 1) % 3]);
 
@@ -183,6 +181,8 @@ namespace TriangleVisualizer
                     triangle[i].X + 25 * centroidToPoint.X - 6,
                     triangle[i].Y + 25 * centroidToPoint.Y - 6);
             }
+
+           
             
         }
 
@@ -225,13 +225,11 @@ namespace TriangleVisualizer
         {
             if(leftMouseDown && selected != null)
             {
-                selected.X = e.X;
-                selected.Y = e.Y;
-                triangle.UpdateAll();
+                selected.X = e.X; selected.Y = e.Y;
                 (sender as Panel).Invalidate();
             }
 
-            if(middleMouseDown)
+            else if(middleMouseDown)
             {
                 int dx = startPoint.X - e.X;
                 int dy = startPoint.Y - e.Y;
@@ -243,10 +241,8 @@ namespace TriangleVisualizer
                     triangle[i].Y -= dy;
                     
                 }
-                triangle.UpdateAll();
                 (sender as Panel).Invalidate();  
             }
-
 
         }
 
