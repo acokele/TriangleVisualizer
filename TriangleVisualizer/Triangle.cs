@@ -6,42 +6,98 @@ using System.Drawing;
 
 namespace TriangleVisualizer
 {
-    public class CoordinateChangedEventArgs : EventArgs
-    {
-        private float _oldValue;
-        private float _newValue;
-
-        public float OldValue { get { return _oldValue; } private set { _oldValue = value; } }
-        public float NewValue { get { return _newValue; } private set { _newValue = value; } }
-
-        public CoordinateChangedEventArgs(float oldValue, float newValue)
-        {
-            OldValue = oldValue; NewValue = newValue;
-        }
-
-    }
-
-    public delegate void CoordinateChangedEventHandler(object sender, CoordinateChangedEventArgs e);
-
-
-    
 
     public class Triangle
     {
+        private TrianglePoint _a;
+        private TrianglePoint _b;
+        private TrianglePoint _c;
+
+        public event ValueChangedEventHandler<TrianglePoint> ACoordinatesChanged;
+        public event ValueChangedEventHandler<TrianglePoint> BCoordinatesChanged;
+        public event ValueChangedEventHandler<TrianglePoint> CCoordinatesChanged;
+
+        protected virtual void OnACoordinatesChanged(ValueChangedEventArgs<TrianglePoint> e)
+        {
+            if (ACoordinatesChanged != null)
+                ACoordinatesChanged(this, e);
+        }
+
+        protected virtual void OnBCoordinatesChanged(ValueChangedEventArgs<TrianglePoint> e)
+        {
+            if (BCoordinatesChanged != null)
+                BCoordinatesChanged(this, e);
+        }
+
+        protected virtual void OnCCoordinatesChanged(ValueChangedEventArgs<TrianglePoint> e)
+        {
+            if (CCoordinatesChanged != null)
+                CCoordinatesChanged(this, e);
+        }
+
         /// <summary>
         /// Coordinates of point A.
         /// </summary>
-        public TrianglePoint A { get; set; }
+        public TrianglePoint A
+        {
+            get
+            {
+                return _a;
+            }
+            set
+            {
+                TrianglePoint oldValue;
+                if (A == null)
+                    oldValue = new TrianglePoint(0, 0);
+                else
+                    oldValue = new TrianglePoint(A.X, A.Y);
+
+                _a = value;
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldValue, A));
+            }
+        }
 
         /// <summary>
         /// Coordinates of point B.
         /// </summary>
-        public TrianglePoint B { get; private set; }
+        public TrianglePoint B
+        {
+            get
+            {
+                return _b;
+            }
+            set
+            {
+                TrianglePoint oldValue;
+                if (B == null)
+                    oldValue = new TrianglePoint(0, 0);
+                else
+                    oldValue = new TrianglePoint(B.X, B.Y);
+                _b = value;
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldValue, B));
+            }
+        }
 
         /// <summary>
         /// Coordinates of point C.
         /// </summary>
-        public TrianglePoint C { get; private set; }
+        public TrianglePoint C
+        {
+            get
+            {
+                return _c;
+            }
+            set
+            {
+                TrianglePoint oldValue;
+                if (C == null)
+                    oldValue = new TrianglePoint(0, 0);
+                else
+                    oldValue = new TrianglePoint(C.X, C.Y);
+                _c = value;
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldValue, C));
+            }
+        }
 
         /// <summary>
         /// Length of side BC.
@@ -87,12 +143,52 @@ namespace TriangleVisualizer
         /// False if points A, B and C are colinear, true otherwise/
         /// </summary>
         public bool IsTriangle { get; private set; }
-        
+
         public Triangle(TrianglePoint _a, TrianglePoint _b, TrianglePoint _c)
         {
             A = _a;
             B = _b;
             C = _c;
+
+            A.XCoordinateChanged += (sender, e) =>
+            {
+                TrianglePoint oldA = new TrianglePoint(e.OldValue, A.Y);
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldA, A));
+            };
+
+            A.YCoordinateChanged += (sender, e) =>
+            {
+                TrianglePoint oldA = new TrianglePoint(A.X, e.OldValue);
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldA, A));
+            };
+
+            B.XCoordinateChanged += (sender, e) =>
+            {
+                TrianglePoint oldB = new TrianglePoint(e.OldValue, B.Y);
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldB, B));
+            };
+
+            B.YCoordinateChanged += (sender, e) =>
+            {
+                TrianglePoint oldB = new TrianglePoint(B.X, e.OldValue);
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldB, B));
+            };
+
+            C.XCoordinateChanged += (sender, e) =>
+            {
+                TrianglePoint oldC = new TrianglePoint(e.OldValue, C.Y);
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldC, C));
+            };
+
+            C.YCoordinateChanged += (sender, e) =>
+            {
+                TrianglePoint oldC = new TrianglePoint(C.X, e.OldValue);
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldC, C));
+            };
+
+            ACoordinatesChanged += (sender, e) => UpdateAll();
+            BCoordinatesChanged += (sender, e) => UpdateAll();
+            CCoordinatesChanged += (sender, e) => UpdateAll();
 
             UpdateAll();
         }
@@ -137,7 +233,7 @@ namespace TriangleVisualizer
 
         }
 
-        public void UpdateAll()
+        private void UpdateAll()
         {
             SideA = Helpers.Distance(B, C);
             SideB = Helpers.Distance(A, C);
