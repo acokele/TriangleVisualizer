@@ -53,7 +53,20 @@ namespace TriangleVisualizer
                     oldValue = new TrianglePoint(A.X, A.Y);
 
                 _a = value;
-                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldValue, A));
+
+                _a.XCoordinateChanged += (sender, e) =>
+                {
+                    TrianglePoint oldA = new TrianglePoint(e.OldValue, _a.Y);
+                    OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldA, _a));
+                };
+
+                _a.YCoordinateChanged += (sender, e) =>
+                {
+                    TrianglePoint oldA = new TrianglePoint(_a.X, e.OldValue);
+                    OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldA, _a));
+                };
+
+                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldValue, _a));
             }
         }
 
@@ -74,7 +87,20 @@ namespace TriangleVisualizer
                 else
                     oldValue = new TrianglePoint(B.X, B.Y);
                 _b = value;
-                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldValue, B));
+
+                _b.XCoordinateChanged += (sender, e) =>
+                {
+                    TrianglePoint oldB = new TrianglePoint(e.OldValue, _b.Y);
+                    OnBCoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldB, _b));
+                };
+
+                _b.YCoordinateChanged += (sender, e) =>
+                {
+                    TrianglePoint oldB = new TrianglePoint(_b.X, e.OldValue);
+                    OnBCoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldB, _b));
+                };
+
+                OnBCoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldValue, _b));
             }
         }
 
@@ -95,7 +121,20 @@ namespace TriangleVisualizer
                 else
                     oldValue = new TrianglePoint(C.X, C.Y);
                 _c = value;
-                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldValue, C));
+
+                _c.XCoordinateChanged += (sender, e) =>
+                {
+                    TrianglePoint oldC = new TrianglePoint(e.OldValue, _c.Y);
+                    OnCCoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldC, _c));
+                };
+
+                _c.YCoordinateChanged += (sender, e) =>
+                {
+                    TrianglePoint oldC = new TrianglePoint(_c.X, e.OldValue);
+                    OnCCoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldC, _c));
+                };
+
+                OnCCoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldValue, _a));
             }
         }
 
@@ -149,42 +188,6 @@ namespace TriangleVisualizer
             A = _a;
             B = _b;
             C = _c;
-
-            A.XCoordinateChanged += (sender, e) =>
-            {
-                TrianglePoint oldA = new TrianglePoint(e.OldValue, A.Y);
-                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldA, A));
-            };
-
-            A.YCoordinateChanged += (sender, e) =>
-            {
-                TrianglePoint oldA = new TrianglePoint(A.X, e.OldValue);
-                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldA, A));
-            };
-
-            B.XCoordinateChanged += (sender, e) =>
-            {
-                TrianglePoint oldB = new TrianglePoint(e.OldValue, B.Y);
-                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldB, B));
-            };
-
-            B.YCoordinateChanged += (sender, e) =>
-            {
-                TrianglePoint oldB = new TrianglePoint(B.X, e.OldValue);
-                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldB, B));
-            };
-
-            C.XCoordinateChanged += (sender, e) =>
-            {
-                TrianglePoint oldC = new TrianglePoint(e.OldValue, C.Y);
-                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldC, C));
-            };
-
-            C.YCoordinateChanged += (sender, e) =>
-            {
-                TrianglePoint oldC = new TrianglePoint(C.X, e.OldValue);
-                OnACoordinatesChanged(new ValueChangedEventArgs<TrianglePoint>(oldC, C));
-            };
 
             ACoordinatesChanged += (sender, e) => UpdateAll();
             BCoordinatesChanged += (sender, e) => UpdateAll();
