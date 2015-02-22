@@ -8,35 +8,40 @@ namespace TriangleVisualizer
 {
     public interface IDrawable
     {
+        Pen NormalPen { get; set; }
         void Draw(Graphics g);
     }
 
-    public interface ISelectable
+    public interface IHoverable
     {
-        bool Selected { get; }
-        bool UpdateSelected(PointF point);
+        Pen HoveredPen { get; set; }
+        bool IsHovered { get; }
+        bool UpdateHovered(PointF point);
     }
 
-    public class Line : IDrawable, ISelectable
+    public class Line : IDrawable, IHoverable
     {
-        PointF StartPoint { get; set; }
-        PointF EndPoint { get; set; }
-        Pen Pen { get; set; }
+        public PointF StartPoint { get; set; }
+        public PointF EndPoint { get; set; }
+        public Pen NormalPen { get; set; }
+        public Pen HoveredPen { get; set; }
 
-        public bool Selected { get; private set; }
+        public bool IsHovered { get; private set; }
 
-        public Line(Pen p, PointF start, PointF end)
-        { Pen = p; StartPoint = start; EndPoint = end; Selected = false; }
+        public Line(PointF start, PointF end, Pen normal, Pen hovered)
+        {
+            NormalPen = normal; HoveredPen = hovered;
+            StartPoint = start; EndPoint = end; IsHovered = false; }
 
         public void Draw(Graphics g)
         {
-            if (!Selected)
-                g.DrawLine(Pen, StartPoint, EndPoint);
+            if (!IsHovered)
+                g.DrawLine(NormalPen, StartPoint, EndPoint);
             else
-                g.DrawLine(new Pen(Color.Green, 4), StartPoint, EndPoint);
+                g.DrawLine(HoveredPen, StartPoint, EndPoint);
         }
 
-        public bool UpdateSelected(PointF point)
+        public bool UpdateHovered(PointF point)
         {
             float D = StartPoint.X * (EndPoint.Y - point.Y)
                + EndPoint.X * (point.Y - StartPoint.Y)
@@ -46,16 +51,15 @@ namespace TriangleVisualizer
             float side = Helpers.Distance(StartPoint, EndPoint);
             float pointToLineDistance = 2 * area / side;
 
-            bool selected = pointToLineDistance < 5;
-            /*if (selected && (Helpers.Distance(point, StartPoint) > side || Helpers.Distance(point, EndPoint) > side))
-                selected = false;*/
+            bool hovered = pointToLineDistance < 5;
+            if (hovered && (Helpers.Distance(point, StartPoint) > side || Helpers.Distance(point, EndPoint) > side))
+                hovered = false;
 
-            if (Selected == selected)
+            if (IsHovered == hovered)
                 return false;
 
-            Selected = selected;
+            IsHovered = hovered;
             return true;
-            System.Diagnostics.Debug.WriteLine(pointToLineDistance);
         }
 
     }
